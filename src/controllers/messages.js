@@ -4,6 +4,7 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
 const makeValidation = require('@withvoid/make-validation')
 const Contact = require('../models/contacts')
+const Message = require('../models/messages')
 
 exports.sendMessageToNumber = async (req, res) => {
   try {
@@ -29,12 +30,19 @@ exports.sendMessageToNumber = async (req, res) => {
         to: phoneNumber
       })
     if (sendMessage) {
-      return res.status(200).json({
-        success: true,
-        message: 'message sent successfully',
-        data: sendMessage
-      })
+      const message = await Message.create({ message: sendMessage.body })
+      if (!message) {
+        return res.status(400).json({
+          success: false,
+          message: 'message not saved'
+        })
+      }
     }
+    return res.status(200).json({
+      success: true,
+      message: 'message sent successfully',
+      data: sendMessage
+    })
   } catch (error) {
     return res.status(400).json({
       success: false,
