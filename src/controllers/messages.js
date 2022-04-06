@@ -22,22 +22,13 @@ exports.sendMessageToNumber = async (req, res) => {
         message: validate.errors
       })
     }
-    // send message to a random number
+    // send message to a registered Twilio random number
     let sendMessage = await client.messages.create(
       {
         body: message,
         from: process.env.TWILIO_PHONE_NUMBER,
         to: phoneNumber
       })
-    if (sendMessage) {
-      const message = await Message.create({ message: sendMessage.body })
-      if (!message) {
-        return res.status(400).json({
-          success: false,
-          message: 'message not saved'
-        })
-      }
-    }
     return res.status(200).json({
       success: true,
       message: 'message sent successfully',
@@ -55,7 +46,8 @@ exports.sendMessageToNumber = async (req, res) => {
 exports.sendMessageToContact = async (req, res) => {
   try {
     let { message } = req.body
-    const { contactId } = req.params
+    const { name } = req.params
+    let from = req.user._id
     const validate = makeValidation(types => ({
       payload: req.body,
       checks: {
@@ -69,7 +61,7 @@ exports.sendMessageToContact = async (req, res) => {
       })
     }
     // send message to contacts number
-    let contact = await Contact.findOne({_id: req.params.contactId})
+    let contact = await Contact.findOne({ name: req.params.name })
     if (!contact) {
       return res.status(400).json({
         success: false,
@@ -82,13 +74,20 @@ exports.sendMessageToContact = async (req, res) => {
         from: process.env.TWILIO_PHONE_NUMBER,
         to: contact.phoneNumber
       })
-    if (message) {
-      return res.status(200).json({
-        success: true,
-        message: 'message sent successfully',
-        data: sendMessage
-      })
+    if (sendMessage) {
+      const message = await Message.create({ from, to: contact._id, message: sendMessage.body })
+      if (!message) {
+        return res.status(400).json({
+          success: false,
+          message: 'message not saved'
+        })
+      }
     }
+    return res.status(200).json({
+      success: true,
+      message: 'message sent successfully',
+      data: sendMessage
+    })
   } catch (error) {
     return res.status(400).json({
       success: false,

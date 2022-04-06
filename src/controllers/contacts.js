@@ -4,6 +4,7 @@ var Contact = require('../models/contacts')
 exports.createContact = async (req, res) => {
   try {
     let { name, phoneNumber } = req.body
+    const userId = req.user._id
     const validate = makeValidation(types => ({
       payload: req.body,
       checks: {
@@ -17,12 +18,20 @@ exports.createContact = async (req, res) => {
         message: validate.errors
       })
     }
-    const contact = await Contact.create({name, phoneNumber})
+    const contact = await Contact.findOne({ name: name })
     if (contact) {
+      return res.status(400).json({
+        success: false,
+        message: 'Contact already exists'
+      })
+    }
+
+    const newContact = await Contact.create({ userId, name, phoneNumber })
+    if (newContact) {
       return res.status(201).json({
         success: true,
         message: 'Contact created successfully',
-        data: contact
+        data: newContact
       })
     }
   } catch (error) {
@@ -34,9 +43,9 @@ exports.createContact = async (req, res) => {
 }
 
 // get a single contact
-exports.getContactById = async (req, res) => {
+exports.getContactByName = async (req, res) => {
   try {
-    const contact = await Contact.findOne({_id: req.params.id})
+    const contact = await Contact.findOne({ name: req.params.name })
     if (contact) {
       return res.status(200).json({
         success: true,
@@ -52,22 +61,22 @@ exports.getContactById = async (req, res) => {
   }
 }
 
-// delete a contact by id
+
 exports.deleteContact = async (req, res) => {
   try {
-    const contact = await Contact.findOne({_id: req.params.id})
+    const contact = await Contact.findOne({name: req.params.name})
     if (!contact) {
       return res.status(404).json({
         success: false,
         message: 'Contact not found'
       })
     }
-    const deletedContact = await Contact.findOneAndDelete({_id: req.params.id})
-    if (deletedContact) {
+    const deleteContact = await Contact.findOneAndDelete({name: req.params.name})
+    if (deleteContact) {
       return res.status(200).json({
         success: true,
         message: 'Contact deleted successfully',
-        data: deletedContact
+        data: deleteContact
       })
     }
   } catch (error) {
@@ -80,7 +89,7 @@ exports.deleteContact = async (req, res) => {
 
 exports.getContacts = async (req, res) => {
   try {
-    const contacts = await Contact.find()
+    const contacts = await Contact.find({})
     if (contacts) {
       return res.status(200).json({
         success: true,
@@ -96,11 +105,10 @@ exports.getContacts = async (req, res) => {
   }
 }
 
-// update a contact by id
 exports.updateContact = async (req, res) => {
   try {
     const { name, phoneNumber } = req.body
-    const contact = await Contact.findOneAndUpdate({_id: req.params.id}, req.body)
+    const contact = await Contact.findOneAndUpdate({name: req.params.name}, req.body)
     if (contact) {
       return res.status(200).json({
         success: true,

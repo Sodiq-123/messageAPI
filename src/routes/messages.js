@@ -4,6 +4,6 @@ var { sendMessageToContact, sendMessageToNumber } = require('../controllers/mess
 var { verifyToken } = require('../middleware/auth')
 
 router.post('/send', verifyToken, sendMessageToNumber)
-router.post('/send/:contactId', verifyToken, sendMessageToContact)
+router.post('/send/:name', verifyToken, sendMessageToContact)
 
 module.exports = router;

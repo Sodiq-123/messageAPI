@@ -13,9 +13,13 @@ const contactSchema = new Schema({
     required: true,
     max: 14
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
   date: { 
-    type: Date, 
-    default: Date.now 
+    type: Date,
+    default: Date.now
   }
 })
 
