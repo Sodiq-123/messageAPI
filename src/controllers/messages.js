@@ -6,42 +6,6 @@ const makeValidation = require('@withvoid/make-validation')
 const Contact = require('../models/contacts')
 const Message = require('../models/messages')
 
-exports.sendMessageToNumber = async (req, res) => {
-  try {
-    let { message, phoneNumber } = req.body
-    const validate = makeValidation(types => ({
-      payload: req.body,
-      checks: {
-        message: { type: types.string },
-        phoneNumber: { type: types.string }
-      }
-    }))
-    if (!validate.success) {
-      return res.status(400).json({
-        success: false,
-        message: validate.errors
-      })
-    }
-    // send message to a registered Twilio random number
-    let sendMessage = await client.messages.create(
-      {
-        body: message,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: phoneNumber
-      })
-    return res.status(200).json({
-      success: true,
-      message: 'message sent successfully',
-      data: sendMessage
-    })
-  } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: error.message
-    })
-  }
-}
-
 // Send message to a saved contact
 exports.sendMessageToContact = async (req, res) => {
   try {

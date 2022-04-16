@@ -1,8 +1,9 @@
-var makeValidation = require('@withvoid/make-validation')
-var jwt = require('jsonwebtoken')
-var bcrypt = require('bcrypt')
-var User = require('../models/users')
-var { getUserById } = require('../utils/helpers')
+const makeValidation = require('@withvoid/make-validation')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+const User = require('../models/users')
+const { getUserById } = require('../utils/helpers')
+const Message = require('../models/messages')
 
 exports.createUser = async (req, res) => {
   try {
@@ -85,16 +86,16 @@ exports.loginUser = async (req, res) => {
 }
 
 // delete a user
-exports.deleteUser = async (req, res) => {
+exports.deleteUserAccount = async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.params.id })
+    const user = await User.findOne({ _id: req.user._id })
     if (!user) {
       return res.status(400).json({
         success: false,
         message: 'User not found'
       })
     }
-    const deletedUser = await User.findOneAndDelete(req.params.id)
+    const deletedUser = await User.findOneAndDelete(req.user._id)
     if (!deletedUser) {
       return res.status(400).json({
         success: false,
@@ -114,20 +115,27 @@ exports.deleteUser = async (req, res) => {
   }
 }
 
-exports.getUserById = async (req, res) => {
+exports.getMessages = async (req, res) => {
   try {
-    const user = await getUserById(req.params.id)
-    if (user) {
+    const user = await getUserById(req.user._id)
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+    const messages = await Message.find({})
+    if (messages) {
       return res.status(200).json({
         success: true,
-        message: 'User fetched',
-        data: user
+        message: 'Messages fetched',
+        data: messages
       })
     }
   } catch (error) {
     return res.status(400).json({
       success: false,
-      message: 'Could not get user'
+      message: 'Could not get messages'
     })
   }
 }

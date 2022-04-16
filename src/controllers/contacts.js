@@ -1,5 +1,5 @@
-var makeValidation = require('@withvoid/make-validation')
-var Contact = require('../models/contacts')
+const makeValidation = require('@withvoid/make-validation')
+const Contact = require('../models/contacts')
 
 exports.createContact = async (req, res) => {
   try {

@@ -1,10 +1,11 @@
-var express = require('express');
-var router = express.Router();
-var { createUser, loginUser, getUserById, deleteUser } = require('../controllers/users')
+const express = require('express');
+const router = express.Router();
+const { createUser, loginUser, getUserById, deleteUserAccount, getMessages } = require('../controllers/users');
+const { verifyToken } = require('../middleware/auth');
 
 router.post('/create', createUser)
 router.post('/login', loginUser)
-router.get('/:id', getUserById)
-router.delete('/:id', deleteUser)
+router.delete('/delete-account', verifyToken, deleteUserAccount)
+router.get('/get-sent-messages', verifyToken, getMessages)
 
 module.exports = router;

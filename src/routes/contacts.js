@@ -1,7 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var { createContact, getContactByName, getContacts, updateContact, deleteContact } = require('../controllers/contacts')
-var { verifyToken } = require('../middleware/auth')
+const express = require('express');
+const router = express.Router();
+const { createContact, getContactByName, getContacts, updateContact, deleteContact } = require('../controllers/contacts')
+const { verifyToken } = require('../middleware/auth')
 
 router.post('/create', verifyToken, createContact)
 router.get('/:name', verifyToken, getContactByName)
