@@ -117,7 +117,7 @@ exports.deleteUserAccount = async (req, res) => {
 
 exports.getMessages = async (req, res) => {
   try {
-    const user = await getUserById(req.user._id)
+    const user = await getUserById(req.user)
     if (!user) {
       return res.status(400).json({
         success: false,
