@@ -3,7 +3,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
-
 // Routes directory
 var indexRouter = require('./src/routes/index');
 var usersRouter = require('./src/routes/users');
@@ -21,13 +20,11 @@ module.exports = (app) => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
-  
   // Specify the routes
   app.use('/', indexRouter);
   app.use('/users', usersRouter);
   app.use('/contact', contactRouter);
   app.use('/message', messageRouter);
-
   // catch 404 and forward to error handler
   app.use('*', (req, res) => {
     return res.status(404).json({
@@ -35,6 +32,5 @@ module.exports = (app) => {
       message: 'API endpoint does not exist'
     })
   });
-
   return app;
 }

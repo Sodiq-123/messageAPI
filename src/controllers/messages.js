@@ -25,7 +25,7 @@ exports.sendMessageToContact = async (req, res) => {
       })
     }
     // send message to contacts number
-    let contact = await Contact.findOne({ name: req.params.name })
+    let contact = await Contact.findOne({ name })
     if (!contact) {
       return res.status(400).json({
         success: false,
